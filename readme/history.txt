@@ -1,2 +1,5 @@
+2024.03.28
++ add: support percent-encoding, e.g. '%20', in URLs (by Alexey T.)
+
 2023.04.05
 + add: added i18n (patch from Markus F.)

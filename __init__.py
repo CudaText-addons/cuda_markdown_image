@@ -1,6 +1,7 @@
 #md img preview
 import os
 import re
+from urllib.parse import unquote
 from cudatext import *
 from .img_size import get_image_size
 #from cudax_lib import get_translation
@@ -71,6 +72,7 @@ def get_url(txt):
     url = pp.split("\"")[0].strip() #get url
     url = url.split("?")[0] #strip query string  ex: cat.img?key&value > cat.img
     log(f"url: {url}")  
+    url = unquote(url) # support %20 etc 
     return url
 
 class Command:
