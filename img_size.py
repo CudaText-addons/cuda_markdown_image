@@ -1,5 +1,5 @@
 import struct
-import imghdr
+from . import imghdr
 
 def get_image_size(fname):
     '''Determine the image type of fhandle and return its size.
@@ -8,14 +8,15 @@ def get_image_size(fname):
         head = fhandle.read(24)
         if len(head) != 24:
             return
-        if imghdr.what(fname) == 'png':
+        typ = imghdr.what(fname)
+        if typ == 'png':
             check = struct.unpack('>i', head[4:8])[0]
             if check != 0x0d0a1a0a:
                 return
             width, height = struct.unpack('>ii', head[16:24])
-        elif imghdr.what(fname) == 'gif':
+        elif typ == 'gif':
             width, height = struct.unpack('<HH', head[6:10])
-        elif imghdr.what(fname) == 'jpeg':
+        elif typ == 'jpeg':
             try:
                 fhandle.seek(0) # Read 0xff next
                 size = 2
