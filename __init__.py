@@ -2,7 +2,6 @@
 import os
 import re
 from urllib.parse import unquote
-from .img_size import get_image_size
 from cudatext import *
 
 from cudax_lib import get_translation
