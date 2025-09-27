@@ -6,8 +6,6 @@ from cudatext import *
 from .img_size import get_image_size
 #from cudax_lib import get_translation
 
-from urllib.parse import urlparse #check if Online URL
-
 from cudax_lib import get_translation
 _ = get_translation(__file__)  # I18N
 
@@ -112,22 +110,11 @@ class Command:
             return
         
         #if online URL, return
-        if urlparse(url).scheme in ('http', 'https'):
+        if url.startswith('http://') or url.startswith('https://'):
             return
-            
-        #>>> from urllib.parse import urlparse
-        #>>> urlparse('img/screen.png')
-        #ParseResult(scheme='', netloc='', path='img/screen.png', params='', query='', fragment='')
-        #>>> urlparse('img/screen.png?raw=true')
-        #ParseResult(scheme='', netloc='', path='img/screen.png', params='', query='raw=true', fragment='')
-        #>>> urlparse(r'file:///C:\Users\xxx\Downloads\cuda_markdown_image')
-        #ParseResult(scheme='file', netloc='', path='/C:\\Users\\xxx\\Downloads\\cuda_markdown_image', params='', query='', fragment='')
-        #>>> urlparse(r'C:\Users\xxx\Downloads\cuda_markdown_image')
-        #ParseResult(scheme='c', netloc='', path='\\Users\\xxx\\Downloads\\cuda_markdown_image', params='', query='', fragment='')
         
         #strip file:/// leading
-        file_scheme_leading = re.findall("file:///", url)
-        if file_scheme_leading:
+        if url.startswith('file:///'):
             url = url[8:]
             log(f"url: {url}")
           
@@ -201,4 +188,3 @@ class Command:
         ed_self.gap(GAP_ADD, nline, id_bitmap, tag=ntag)
 
         print(PRE + _('"%s", %dx%d, line %d') % (os.path.basename(fn), size_x, size_y, nline+1))
-
