@@ -13,7 +13,7 @@ PRE = 'Markdown Image: '
 MIN_H = 10 #limitations of api to gap height
 MAX_H = 500-5
 
-REGEX_URL = r'!\[.*?\]\((\S+).*\)'
+REGEX_URL = r'!\[.*?\]\(([^\) ]+).*?\)'
 regex_url_compiled = re.compile(REGEX_URL, 0)
 
 data_all = {}
