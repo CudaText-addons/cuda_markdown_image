@@ -2,19 +2,19 @@
 import os
 import re
 from urllib.parse import unquote
-from cudatext import *
 from .img_size import get_image_size
-#from cudax_lib import get_translation
+from cudatext import *
 
 from cudax_lib import get_translation
 _ = get_translation(__file__)  # I18N
 
-#PIC_TAG = 0x1000 #minimal tag for api (CRC adds to tag)
 BIG_SIZE = 500 #if width bigger, ask to resize
-#DIALOG_FILTER = 'Pictures|*.png;*.jpg;*.jpeg;*.jpe;*.gif;*.bmp;*.ico'
-PRE = '[Markdown Image] '
+PRE = 'Markdown Image: '
 MIN_H = 10 #limitations of api to gap height
 MAX_H = 500-5
+
+REGEX_URL = r'!\[.*?\]\((\S+).*\)'
+regex_url_compiled = re.compile(REGEX_URL, 0)
 
 data_all = {}
 id_img = image_proc(0, IMAGE_CREATE)
@@ -23,51 +23,14 @@ def log(s):
     #print(s)
     pass
 
-def right_parenthesis_index(txt):
-    """ get index of markdown image syntax's right parenthesis ) """
-    i = 0
-    right_parenthesis_index = 0 # ) index of markdown image syntax;     ![ ]( )
-                                #                                             ^
-                                
-    #In order to read:  folder/img (2).jpg  this type of url,
-    #![aaa](bbb), I assume bbb part **must** has multiple **pair** of parenthesis.
-    #if the number of right parenthesis != left parenthesis, right_parenthesis_index return 0
-    for index in range(0, len(txt)):
-        if txt[index] == "(":
-            i += 1
-        elif txt[index] == ")":
-            i -= 1
-            if i == 0:
-                right_parenthesis_index = index
-                break
-    return right_parenthesis_index
-
 def get_url(txt):
-    """input line_text, return url
-    The parenthesis must be paired in order to work."""
-    #In markdown's syntax, url can't mix with ), otherwise it become unsure ) is url or part of image syntax.
-    #But we can **assume** the parenthesis must be paired.
-    
-    x = re.findall("!\[[^\]]*\]\([^\)]+\)", txt) 
-        #get image syntax ex: ![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
-    #log(f"image syntax: {x}")
-    if not x:
-        #log("Can't find image syntax.")
+    url = ''
+    for item in regex_url_compiled.finditer(txt):
+        url = item.group(1)
+        break
+    if not url:
         return
-        
-    x = txt[re.search("!\[[^\]]*\]\(", txt).end()-1:] #strip  ![xxx]  part
-    rp = right_parenthesis_index(x)
-    if not rp:
-        log("The parenthesis must be paired in order to work.")
-        return
-    p = x[:rp] #strip anything after right parenthesis), including itself
-    pp = p[1:] #strip prefix (
-    
-    #q = re.search("!\[[^\]]+\]", x[0]) #get title ex: ![sdff]
-    #log(q.group()[2:-1])
-    #p = re.search("\([^\)]+", x[0]) #get (... part ex: (https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat"
-    #pp = p.group()[1:] #strip prefix (
-    url = pp.split("\"")[0].strip() #get url
+
     url = url.split("?")[0] #strip query string  ex: cat.img?key&value > cat.img
     log(f"url: {url}")  
     url = unquote(url) # support %20 etc 
