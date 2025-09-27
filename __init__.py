@@ -34,6 +34,7 @@ def get_url(txt):
     url = unquote(url) # support %20 etc
     return url
 
+
 class Command:
 
     def __init__(self):
@@ -92,16 +93,26 @@ class Command:
 
         if not os.path.isfile(fn):
             ed_self.gap(GAP_DELETE, nline, nline)
-            msg_status(PRE + _('Cannot find picture'))
+            print(PRE + _('Cannot find picture file: ') + fn)
             return
 
         ntag = 2 #for delete
 
-        res = get_image_size(fn)
-        if not res:
-            msg_status(PRE + _('Cannot detect picture sizes'))
-            return
-        size_x, size_y = res
+        self.add_pic(ed_self, nline, fn, ntag)
+
+        ## better don't set PROP_MODIFIED
+        #ed_self.set_prop(PROP_MODIFIED, True)
+
+    def add_pic(self, ed_self, nline, fn, ntag):
+
+        global id_img
+        log(id_img)
+        log(fn)
+        if not image_proc(id_img, IMAGE_LOAD, fn):
+           print(PRE + _('Cannot load picture: ') + os.path.basename(fn))
+           return
+
+        size_x, size_y = image_proc(id_img, IMAGE_GET_SIZE)
 
         #reduce size and keep aspect ratio
         if size_x > BIG_SIZE or size_y > BIG_SIZE:
@@ -115,22 +126,6 @@ class Command:
                 size_y = BIG_SIZE
         if size_y < MIN_H:
             size_y = MIN_H
-
-        self.add_pic(ed_self, nline, fn, size_x, size_y, ntag)
-
-        ## better don't set PROP_MODIFIED
-        #ed_self.set_prop(PROP_MODIFIED, True)
-
-        msg_status(PRE + _('Added "%s", %dx%d, line %d') % (os.path.basename(fn), size_x, size_y, nline))
-
-    def add_pic(self, ed_self, nline, fn, size_x, size_y, ntag):
-
-        global id_img
-        log(id_img)
-        log(fn)
-        if not image_proc(id_img, IMAGE_LOAD, fn):
-           print(PRE + _('Cannot load "%s"') % os.path.basename(fn))
-           return
 
         new_y = None
         if size_y < MIN_H: new_y = MIN_H
@@ -148,4 +143,4 @@ class Command:
         ed_self.gap(GAP_DELETE, nline, nline)
         ed_self.gap(GAP_ADD, nline, id_bitmap, tag=ntag)
 
-        print(PRE + _('"%s", %dx%d, line %d') % (os.path.basename(fn), size_x, size_y, nline+1))
+        print(PRE + _('Added "%s", %dx%d, line %d') % (os.path.basename(fn), size_x, size_y, nline+1))

@@ -4,6 +4,7 @@ from . import imghdr
 def get_image_size(fname):
     '''Determine the image type of fhandle and return its size.
     from draco'''
+
     with open(fname, 'rb') as fhandle:
         head = fhandle.read(24)
         if len(head) != 24:
