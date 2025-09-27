@@ -24,20 +24,18 @@ def log(s):
     pass
 
 def get_url(txt):
-    url = ''
-    for item in regex_url_compiled.finditer(txt):
-        url = item.group(1)
-        break
-    if not url:
+    m = regex_url_compiled.search(txt)
+    if not m:
         return
+    url = m.group(1)
 
     url = url.split("?")[0] #strip query string  ex: cat.img?key&value > cat.img
-    log(f"url: {url}")  
-    url = unquote(url) # support %20 etc 
+    log(f"url: {url}")
+    url = unquote(url) # support %20 etc
     return url
 
 class Command:
-    
+
     def __init__(self):
 
         pass
@@ -45,7 +43,7 @@ class Command:
     def config(self):
 
         pass
-        
+
     def on_change_slow(self, ed_self):
         carets = ed_self.get_carets()
         x1, nline, x2, y2 = carets[0]
@@ -55,7 +53,7 @@ class Command:
     def on_open(self, ed_self):
         #fn_ed = ed_self.get_filename()
         #if not fn_ed: return #unsaved file???
-        
+
         for index in range(ed_self.get_line_count()):
             line = ed_self.get_text_line(index)
             self.insert_file(ed_self, line, index)
@@ -71,23 +69,23 @@ class Command:
         url = get_url(txt)
         if not url:
             return
-        
+
         #if online URL, return
         if url.startswith('http://') or url.startswith('https://'):
             return
-        
+
         #strip file:/// leading
         if url.startswith('file:///'):
             url = url[8:]
             log(f"url: {url}")
-          
+
         log(f"absolute path?: {os.path.isabs(url)}")
         #                                           os.path.isabs()    urlparse(url).scheme in ('file')
         # file://C:\Windows\System32\Security.png   False              True
         # file:///C:\Windows\System32\Security.png  False              True
         #                                    0.jpg  False              True
         if os.path.isabs(url):
-            fn = url            
+            fn = url
         else:
             filepath = ed_self.get_filename()
             fn = os.path.join(os.path.dirname(filepath), url)
@@ -96,15 +94,15 @@ class Command:
             ed_self.gap(GAP_DELETE, nline, nline)
             msg_status(PRE + _('Cannot find picture'))
             return
-        
+
         ntag = 2 #for delete
-        
+
         res = get_image_size(fn)
         if not res:
             msg_status(PRE + _('Cannot detect picture sizes'))
             return
         size_x, size_y = res
-        
+
         #reduce size and keep aspect ratio
         if size_x > BIG_SIZE or size_y > BIG_SIZE:
             if size_x >= size_y:
@@ -114,7 +112,7 @@ class Command:
                 size_x = BIG_SIZE
             else:
                 size_x = round(size_x / size_y * BIG_SIZE)
-                size_y = BIG_SIZE       
+                size_y = BIG_SIZE
         if size_y < MIN_H:
             size_y = MIN_H
 
