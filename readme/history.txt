@@ -1,6 +1,7 @@
 2026.11.22
 - fix: avoid deprecated API: get_filename
 - fix: avoid deprecated API: GAP_MAKE_BITMAP
+- fix: avoid deprecated API: IMAGE_PAINT_SIZED
 
 2025.09.27
 + add: simplify code (by Alexey T.)
