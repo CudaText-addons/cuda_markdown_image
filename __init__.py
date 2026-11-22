@@ -1,4 +1,3 @@
-#md img preview
 import os
 import re
 from urllib.parse import unquote
@@ -51,7 +50,7 @@ class Command:
         self.insert_file(ed_self, txt, nline)
 
     def on_open(self, ed_self):
-        #fn_ed = ed_self.get_filename()
+        #fn_ed = ed_self.get_prop(PROP_FN, '')
         #if not fn_ed: return #unsaved file???
 
         for index in range(ed_self.get_line_count()):
@@ -87,7 +86,7 @@ class Command:
         if os.path.isabs(url):
             fn = url
         else:
-            filepath = ed_self.get_filename()
+            filepath = ed_self.get_prop(PROP_FN, '')
             fn = os.path.join(os.path.dirname(filepath), url)
 
         if not os.path.isfile(fn):
