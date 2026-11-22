@@ -132,7 +132,8 @@ class Command:
             size_x = round(size_x/size_y*new_y)
             size_y = new_y
 
-        id_bitmap, id_canvas = ed_self.gap(GAP_MAKE_BITMAP, size_x, size_y)
+        id_bitmap = bitmap_proc(0, BITMAP_CREATE, size_x, size_y)
+        id_canvas = bitmap_proc(id_bitmap, BITMAP_GET_CANVAS)
         canvas_proc(id_canvas, CANVAS_SET_BRUSH, color=0xffffff)
         canvas_proc(id_canvas, CANVAS_RECT_FILL, x=0, y=0, x2=size_x, y2=size_y)
 
